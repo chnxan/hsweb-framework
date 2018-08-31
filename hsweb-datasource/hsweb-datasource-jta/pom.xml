@@ -5,7 +5,9 @@
     <parent>
         <artifactId>hsweb-datasource</artifactId>
         <groupId>org.hswebframework.web</groupId>
-        <version>3.0-SNAPSHOT</version>
+        <version>3.0.0-RC-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -67,11 +69,6 @@
         </dependency>
 
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-jdbc</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>org.hswebframework.web</groupId>
             <artifactId>hsweb-datasource-api</artifactId>
             <version>${project.version}</version>
@@ -80,6 +77,13 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-jta-atomikos</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hswebframework.web</groupId>
+            <artifactId>hsweb-commons-dao-mybatis</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
         </dependency>
 
         <dependency>

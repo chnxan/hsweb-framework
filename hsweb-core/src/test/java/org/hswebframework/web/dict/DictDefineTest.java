@@ -1,13 +1,16 @@
 package org.hswebframework.web.dict;
 
+import com.alibaba.fastjson.JSON;
 import org.hswebframework.web.dict.defaults.DefaultClassDictDefine;
 import org.hswebframework.web.dict.defaults.DefaultDictDefineRepository;
 import org.hswebframework.web.dict.defaults.DefaultDictSupportApi;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.List;
 
+import static org.hswebframework.web.dict.EnumDict.*;
 import static org.junit.Assert.*;
 
 /**
@@ -21,49 +24,41 @@ public class DictDefineTest {
     private DictSupportApi api = new DefaultDictSupportApi(repository);
 
     @Test
-    public void testParse() {
+    public void testJson(){
 
-        DefaultClassDictDefine define = DefaultClassDictDefine.builder()
-                .id("test-code")
-                .field("code")
-                .build();
-        repository.registerDefine(define);
-        List<ClassDictDefine> defines = repository.getDefine(UseDictEntity2.class);
-        assertFalse(defines.isEmpty());
-        assertEquals(defines.size(), 2);
+        UserCode code=UserCode.CODE0;
+
+        String json  =JSON.toJSONString(code);
+        System.out.println(json);
+        Assert.assertNotNull(json);
+        Assert.assertNotNull(JSON.parseObject(json,UserCode.class));
+
     }
-
     @Test
-    public void testWrap() {
-        assertNull(api.wrap(null));
-        assertNotNull(api.wrap(new HashMap<>()));
-        assertNull(api.unwrap(null));
-        assertNotNull(api.unwrap(new HashMap<>()));
+    public void testEnumDict() {
 
-        UseDictEntity2 entity = new UseDictEntity2();
-        entity.setStatus(new Integer(1).byteValue());
+        Assert.assertEquals(UserCode.SIMPLE, findByValue(UserCode.class, UserCode.SIMPLE.getValue()).orElse(null));
 
-        entity = api.wrap(entity);
+        Assert.assertEquals(UserCode.SIMPLE, findByText(UserCode.class, UserCode.SIMPLE.getText()).orElse(null));
 
-        assertEquals(entity.getStatusText(), "正常");
+        Assert.assertEquals(UserCode.SIMPLE, find(UserCode.class, UserCode.SIMPLE.getText()).orElse(null));
 
-        entity.setStatus(null);
-        entity = api.unwrap(entity);
-        assertEquals(entity.getStatus(), Byte.valueOf((byte) 1));
+        long bit = toMask( UserCode.values());
 
-        entity.setStatus((byte) 2);
-        entity = api.unwrap(entity);
-        assertEquals(entity.getStatus(), Byte.valueOf((byte) 2));
+        System.out.println(maskIn(bit,UserCode.SIMPLE,UserCode.TEST,UserCode.SIMPLE));
 
-        entity.setStatus(null);
-        entity.setStatusText(null);
-        entity.setCode("1");
-        api.wrap(entity);
+        long bit2= toMask(UserCode.SIMPLE,UserCode.CODE0,UserCode.SIMPLE);
 
-        assertNull(entity.getStatusText());
-        assertEquals(entity.getCode(), "1");
+        Assert.assertTrue(maskInAny(bit2,UserCode.SIMPLE,UserCode.CODE4,UserCode.CODE0));
+        Assert.assertFalse(maskInAny(bit2,UserCode.CODE1,UserCode.CODE4,UserCode.CODE5));
 
-        api.unwrap(entity);
-        assertEquals(entity.getCode(), "1");
+        for (UserCode userCode : UserCode.values()) {
+            Assert.assertTrue(userCode.in(bit));
+        }
+
+        List<UserCode> codes = getByMask(UserCode.class, bit);
+
+
     }
+
 }

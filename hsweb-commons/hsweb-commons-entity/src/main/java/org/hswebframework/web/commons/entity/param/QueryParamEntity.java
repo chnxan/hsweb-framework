@@ -21,6 +21,8 @@ import org.hswebframework.web.commons.entity.QueryEntity;
  */
 public class QueryParamEntity extends QueryParam implements QueryEntity {
 
+    private static final long serialVersionUID = 8097500947924037523L;
+
     /**
      * 创建一个空的查询参数实体,该实体无任何参数.
      *
@@ -39,6 +41,24 @@ public class QueryParamEntity extends QueryParam implements QueryEntity {
      * @see QueryParam#where(String, Object)
      */
     public static QueryParamEntity single(String field, Object value) {
+        return of(field, value);
+    }
+
+    /**
+     * @see this#single(String, Object)
+     */
+    public static QueryParamEntity of(String field, Object value) {
         return empty().where(field, value);
     }
+
+    @Override
+    public String toString() {
+        return toHttpQueryParamString();
+    }
+
+    public QueryParamEntity noPaging() {
+        setPaging(false);
+        return this;
+    }
+
 }

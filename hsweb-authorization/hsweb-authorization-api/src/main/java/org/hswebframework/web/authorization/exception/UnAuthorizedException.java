@@ -29,14 +29,14 @@ import org.hswebframework.web.authorization.token.TokenState;
 public class UnAuthorizedException extends RuntimeException {
     private static final long serialVersionUID = 2422918455013900645L;
 
-    private TokenState state;
+    private final TokenState state;
 
     public UnAuthorizedException() {
         this(TokenState.expired);
     }
 
     public UnAuthorizedException(TokenState state) {
-        this("{un_authorization}", state);
+        this(state.getText(), state);
     }
 
     public UnAuthorizedException(String message, TokenState state) {

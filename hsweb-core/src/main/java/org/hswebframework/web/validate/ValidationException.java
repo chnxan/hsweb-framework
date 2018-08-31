@@ -21,9 +21,11 @@ package org.hswebframework.web.validate;
 
 import org.hswebframework.web.BusinessException;
 
+import java.util.Collections;
 import java.util.List;
 
 public class ValidationException extends BusinessException {
+    private static final long serialVersionUID = 7807607467371210082L;
     private ValidateResults results;
 
     public ValidationException(String message) {
@@ -36,13 +38,13 @@ public class ValidationException extends BusinessException {
     }
 
     public ValidationException(ValidateResults results) {
-        super(results.toString(), 400);
+        super(results.getResults().get(0).getMessage(), 400);
         this.results = results;
     }
 
     public List<ValidateResults.Result> getResults() {
         if (results == null) {
-            return null;
+            return new java.util.ArrayList<>();
         }
         return results.getResults();
     }

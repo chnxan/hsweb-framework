@@ -57,7 +57,8 @@ public class RestControllerExceptionTranslator {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     ResponseMessage<Object> handleException(org.hswebframework.ezorm.rdb.exception.ValidationException exception) {
-        return ResponseMessage.error(400, exception.getMessage()).result(exception.getValidateResult());
+        return ResponseMessage.error(400, exception.getMessage())
+                .result(exception.getValidateResult());
     }
 
     @ExceptionHandler(ValidationException.class)
@@ -75,13 +76,13 @@ public class RestControllerExceptionTranslator {
         if (exception.getCause() != null) {
             logger.error("{}:{}", exception.getMessage(), exception.getStatus(), exception.getCause());
         }
-        return ResponseMessage.error(exception.getStatus(), exception.getMessage());
+        return ResponseMessage.error(exception.getStatus(), exception.getMessage()).result(exception.getCode());
     }
 
     @ExceptionHandler(UnAuthorizedException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ResponseBody
-    ResponseMessage handleException(UnAuthorizedException exception, HttpServletResponse response) {
+    ResponseMessage handleException(UnAuthorizedException exception) {
         return ResponseMessage.error(401, exception.getMessage()).result(exception.getState());
     }
 
@@ -110,7 +111,7 @@ public class RestControllerExceptionTranslator {
                 .map(FieldError.class::cast)
                 .forEach(fieldError -> results.addResult(fieldError.getField(), fieldError.getDefaultMessage()));
 
-        return ResponseMessage.error(400, results.getResults().size() == 0 ? e.getMessage() : results.getResults().get(0).getMessage()).result(results.getResults());
+        return ResponseMessage.error(400, results.getResults().isEmpty() ? e.getMessage() : results.getResults().get(0).getMessage()).result(results.getResults());
     }
 
     @ExceptionHandler(RuntimeException.class)
@@ -121,6 +122,14 @@ public class RestControllerExceptionTranslator {
         return ResponseMessage.error(500, exception.getMessage());
     }
 
+    @ExceptionHandler(NullPointerException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseBody
+    ResponseMessage handleException(NullPointerException exception) {
+        logger.error(exception.getMessage(), exception);
+        return ResponseMessage.error(500, "服务器内部错误");
+    }
+
     @ExceptionHandler(SQLException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ResponseBody
@@ -129,14 +138,11 @@ public class RestControllerExceptionTranslator {
         return ResponseMessage.error(500, "服务器内部错误");
     }
 
-
-//    @ExceptionHandler(Throwable.class)
-//    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-//    @ResponseBody
-//    @Order()
-//    ResponseMessage handleException(Throwable exception) {
-//        logger.error(exception.getMessage(), exception);
-//        return ResponseMessage.error(exception.getMessage(), 500);
-//    }
-
+    @ExceptionHandler(IllegalArgumentException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    ResponseMessage handleException(IllegalArgumentException exception) {
+        logger.error(exception.getMessage(), exception);
+        return ResponseMessage.error(400, "参数错误:" + exception.getMessage());
+    }
 }

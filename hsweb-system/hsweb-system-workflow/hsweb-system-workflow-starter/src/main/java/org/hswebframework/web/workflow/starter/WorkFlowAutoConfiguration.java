@@ -1,19 +1,17 @@
 package org.hswebframework.web.workflow.starter;
 
-import org.hswebframework.web.service.workflow.ActDefService;
-import org.hswebframework.web.service.workflow.simple.SimpleActDefService;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.context.annotation.Bean;
+import com.alibaba.fastjson.parser.ParserConfig;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @ComponentScan("org.hswebframework.web.workflow")
-public class WorkFlowAutoConfiguration {
+public class WorkFlowAutoConfiguration implements CommandLineRunner {
 
-    @Bean
-    @ConditionalOnMissingBean(ActDefService.class)
-    public SimpleActDefService simpleActDefService(){
-        return new SimpleActDefService();
+    @Override
+    public void run(String... args) throws Exception {
+        ParserConfig.getGlobalInstance()
+                .addAccept("org.hswebframework.web.workflow.dao.entity");
     }
 }

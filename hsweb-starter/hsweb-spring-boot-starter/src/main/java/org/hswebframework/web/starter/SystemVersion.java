@@ -20,6 +20,7 @@ package org.hswebframework.web.starter;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
+import lombok.extern.slf4j.Slf4j;
 import org.hswebframework.utils.ListUtils;
 import org.hswebframework.utils.StringUtils;
 
@@ -88,23 +89,23 @@ public class SystemVersion extends Version {
         /**
          * @see SystemVersion#name
          */
-        String name            = "name";
+        String name = "name";
         /**
          * @see SystemVersion#comment
          */
-        String comment         = "comment";
+        String comment = "comment";
         /**
          * @see SystemVersion#website
          */
-        String website         = "website";
+        String website = "website";
         /**
          * @see SystemVersion#majorVersion
          */
-        String majorVersion    = "majorVersion";
+        String majorVersion = "majorVersion";
         /**
          * @see SystemVersion#minorVersion
          */
-        String minorVersion    = "minorVersion";
+        String minorVersion = "minorVersion";
         /**
          * @see SystemVersion#revisionVersion
          */
@@ -112,7 +113,7 @@ public class SystemVersion extends Version {
         /**
          * @see SystemVersion#snapshot
          */
-        String snapshot        = "snapshot";
+        String snapshot = "snapshot";
 
         /**
          * @see SystemVersion#frameworkVersion
@@ -180,15 +181,15 @@ public class SystemVersion extends Version {
     }
 }
 
-
+@Slf4j
 class Version implements Comparable<Version> {
     protected String name;
     protected String comment;
     protected String website;
-    protected int     majorVersion    = 1;
-    protected int     minorVersion    = 0;
-    protected int     revisionVersion = 0;
-    protected boolean snapshot        = false;
+    protected int majorVersion = 1;
+    protected int minorVersion = 0;
+    protected int revisionVersion = 0;
+    protected boolean snapshot = false;
 
     public void setVersion(int major, int minor, int revision, boolean snapshot) {
         this.majorVersion = major;
@@ -202,11 +203,16 @@ class Version implements Comparable<Version> {
             return;
         }
         boolean snapshot = version.toLowerCase().contains("snapshot");
-        version = version.toLowerCase().replace(".snapshot", "").replace("-snapshot", "");
+        version = version.toLowerCase()
+                .replace(".snapshot", "")
+                .replace("-snapshot", "")
+                .replace("-rc", "")
+                .replace("-release", "");
         String[] ver = version.split("[.]");
         Integer[] numberVer = ListUtils.stringArr2intArr(ver);
         if (numberVer.length < 1 || Arrays.stream(numberVer).anyMatch(Objects::isNull)) {
-            throw new UnsupportedOperationException("format version " + version + " error  ");
+            numberVer = new Integer[]{1, 0, 0};
+            log.warn("解析版本号失败:{},将使用默认版本号:1.0.0,请检查hsweb-starter.js配置内容!", version);
         }
         setVersion(numberVer[0],
                 numberVer.length <= 1 ? 0 : numberVer[1],

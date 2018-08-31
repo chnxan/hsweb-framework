@@ -41,7 +41,7 @@ public class BasicAuthorizationTokenParser implements UserTokenForTypeParser {
         try {
             String usernameAndPassword = new String(Base64.decodeBase64(authorization));
             UserToken token = userTokenManager.getByToken(usernameAndPassword);
-            if (token != null && token.isEffective()) {
+            if (token != null && token.isNormal()) {
                 return new ParsedToken() {
                     @Override
                     public String getToken() {
@@ -76,8 +76,8 @@ public class BasicAuthorizationTokenParser implements UserTokenForTypeParser {
 
                         @Override
                         public long getMaxInactiveInterval() {
-                            //10分钟有效期
-                            return 10_60_1000;
+                            //60分钟有效期
+                            return 60*60*1000L;
                         }
                     };
                 }
